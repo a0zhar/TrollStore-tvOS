@@ -143,6 +143,21 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 
 		[_specifiers addObject:rebuildIconCacheSpecifier];
 
+        // test
+        PSSpecifier* testSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Test Install"
+                                            target:self
+                                            set:nil
+                                            get:nil
+                                            detail:nil
+                                            cell:PSButtonCell
+                                            edit:nil];
+        testSpecifier.identifier = @"test";
+        [testSpecifier setProperty:@YES forKey:@"enabled"];
+        testSpecifier.buttonAction = @selector(testPressed);
+
+        [_specifiers addObject:testSpecifier];
+        
+        
 		//if (@available(iOS 16, *)) { } else {
 			NSString* ldidPath = [NSBundle.mainBundle.bundlePath stringByAppendingPathComponent:@"ldid"];
 			NSString* ldidVersionPath = [NSBundle.mainBundle.bundlePath stringByAppendingPathComponent:@"ldid.version"];
@@ -295,15 +310,15 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 
 		[_specifiers addObject:installationSettingsGroupSpecifier];
 
-		PSSpecifier* URLSchemeToggle = [PSSpecifier preferenceSpecifierNamed:@"URL Scheme Enabled"
-										target:self
-										set:@selector(setURLSchemeEnabled:forSpecifier:)
-										get:@selector(getURLSchemeEnabledForSpecifier:)
-										detail:nil
-										cell:PSSwitchCell
-										edit:nil];
-
-		[_specifiers addObject:URLSchemeToggle];
+//		PSSpecifier* URLSchemeToggle = [PSSpecifier preferenceSpecifierNamed:@"URL Scheme Enabled"
+//										target:self
+//										set:@selector(setURLSchemeEnabled:forSpecifier:)
+//										get:@selector(getURLSchemeEnabledForSpecifier:)
+//										detail:nil
+//										cell:PSSwitchCell
+//										edit:nil];
+//
+//		[_specifiers addObject:URLSchemeToggle];
 
 		PSSpecifier* installAlertConfigurationSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Show Install Confirmation Alert"
 										target:self
@@ -377,6 +392,24 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 
 	[(UINavigationItem *)self.navigationItem setTitle:@"Settings"];
 	return _specifiers;
+}
+
+- (void)testPressed
+{
+    [TSPresentationDelegate startActivity:@"Test Install"];
+
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
+    {
+        NSString *urlString = @"https://github.com/straight-tamago/TrollStore-tvOS/releases/download/test/Payload.ipa";
+        NSURL *remoteURL = [NSURL URLWithString:urlString];
+
+        [TSInstallationController handleAppInstallFromRemoteURL:remoteURL completion:nil];
+        
+        dispatch_async(dispatch_get_main_queue(), ^
+        {
+            [TSPresentationDelegate stopActivityWithCompletion:nil];
+        });
+    });
 }
 
 - (NSArray*)installationConfirmationValues

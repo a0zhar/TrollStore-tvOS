@@ -166,10 +166,10 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 
 - (void)_setUpSearchBar
 {
-	_searchController = [[UISearchController alloc] initWithSearchResultsController:nil];
-	_searchController.searchResultsUpdater = self;
-	_searchController.obscuresBackgroundDuringPresentation = NO;
-	self.navigationItem.searchController = _searchController;
+//	_searchController = [[UISearchController alloc] initWithSearchResultsController:nil];
+//	_searchController.searchResultsUpdater = self;
+//	_searchController.obscuresBackgroundDuringPresentation = NO;
+//	self.navigationItem.searchController = _searchController;
 	self.navigationItem.hidesSearchBarWhenScrolling = YES;
 }
 

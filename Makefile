@@ -1,7 +1,6 @@
 TOPTARGETS := all clean update
 
-$(TOPTARGETS): pre_build make_fastPathSign make_roothelper make_trollstore make_trollhelper_embedded make_trollhelper_package assemble_trollstore build_installer15 build_installer64e
-
+$(TOPTARGETS): pre_build make_fastPathSign make_roothelper make_trollstore make_trollhelper_embedded make_trollhelper_package assemble_trollstore
 pre_build:
 	@rm -rf ./_build 2>/dev/null || true
 	@mkdir -p ./_build
@@ -19,7 +18,7 @@ ifneq ($(MAKECMDGOALS),clean)
 
 make_trollhelper_package:
 	@$(MAKE) clean -C ./TrollHelper
-	@cp ./RootHelper/.theos/obj/trollstorehelper ./TrollHelper/Resources/trollstorehelper
+	@cp ./RootHelper/.theos/obj/appletv/trollstorehelper ./TrollHelper/Resources/trollstorehelper
 	@$(MAKE) -C ./TrollHelper FINALPACKAGE=1 package $(MAKECMDGOALS)
 	@$(MAKE) clean -C ./TrollHelper
 	@$(MAKE) -C ./TrollHelper THEOS_PACKAGE_SCHEME=rootless FINALPACKAGE=1 package $(MAKECMDGOALS)
@@ -28,20 +27,20 @@ make_trollhelper_package:
 make_trollhelper_embedded:
 	@$(MAKE) clean -C ./TrollHelper
 	@$(MAKE) -C ./TrollHelper FINALPACKAGE=1 EMBEDDED_ROOT_HELPER=1 $(MAKECMDGOALS)
-	@cp ./TrollHelper/.theos/obj/TrollStorePersistenceHelper.app/TrollStorePersistenceHelper ./_build/PersistenceHelper_Embedded
-	@$(MAKE) clean -C ./TrollHelper
-	@$(MAKE) -C ./TrollHelper FINALPACKAGE=1 EMBEDDED_ROOT_HELPER=1 LEGACY_CT_BUG=1 $(MAKECMDGOALS)
-	@cp ./TrollHelper/.theos/obj/TrollStorePersistenceHelper.app/TrollStorePersistenceHelper ./_build/PersistenceHelper_Embedded_Legacy_arm64
-	@$(MAKE) clean -C ./TrollHelper
-	@$(MAKE) -C ./TrollHelper FINALPACKAGE=1 EMBEDDED_ROOT_HELPER=1 CUSTOM_ARCHS=arm64e $(MAKECMDGOALS)
-	@cp ./TrollHelper/.theos/obj/TrollStorePersistenceHelper.app/TrollStorePersistenceHelper ./_build/PersistenceHelper_Embedded_Legacy_arm64e
-	@$(MAKE) clean -C ./TrollHelper
+	@cp ./TrollHelper/.theos/obj/appletv/TrollStorePersistenceHelper.app/TrollStorePersistenceHelper ./_build/PersistenceHelper_Embedded
+#	@$(MAKE) clean -C ./TrollHelper
+#	@$(MAKE) -C ./TrollHelper FINALPACKAGE=1 EMBEDDED_ROOT_HELPER=1 LEGACY_CT_BUG=1 $(MAKECMDGOALS)
+#	@cp ./TrollHelper/.theos/obj/appletv/TrollStorePersistenceHelper.app/TrollStorePersistenceHelper ./_build/PersistenceHelper_Embedded_Legacy_arm64
+#	@$(MAKE) clean -C ./TrollHelper
+#	@$(MAKE) -C ./TrollHelper FINALPACKAGE=1 EMBEDDED_ROOT_HELPER=1 CUSTOM_ARCHS=arm64e $(MAKECMDGOALS)
+#	@cp ./TrollHelper/.theos/obj/appletv/TrollStorePersistenceHelper.app/TrollStorePersistenceHelper ./_build/PersistenceHelper_Embedded_Legacy_arm64e
+#	@$(MAKE) clean -C ./TrollHelper
 
 assemble_trollstore:
-	@cp ./RootHelper/.theos/obj/trollstorehelper ./TrollStore/.theos/obj/TrollStore.app/trollstorehelper
-	@cp ./TrollHelper/.theos/obj/TrollStorePersistenceHelper.app/TrollStorePersistenceHelper ./TrollStore/.theos/obj/TrollStore.app/PersistenceHelper
+	@cp ./RootHelper/.theos/obj/appletv/trollstorehelper ./TrollStore/.theos/obj/appletv/TrollStore.app/trollstorehelper
+	@cp ./TrollHelper/.theos/obj/appletv/TrollStorePersistenceHelper.app/TrollStorePersistenceHelper ./TrollStore/.theos/obj/appletv/TrollStore.app/PersistenceHelper
 	@export COPYFILE_DISABLE=1
-	@tar -czvf ./_build/TrollStore.tar -C ./TrollStore/.theos/obj TrollStore.app
+	@tar -czvf ./_build/TrollStore.tar -C ./TrollStore/.theos/obj/appletv TrollStore.app
 
 build_installer15:
 	@mkdir -p ./_build/tmp15

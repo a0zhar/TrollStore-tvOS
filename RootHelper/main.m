@@ -586,7 +586,11 @@ int signApp(NSString* appPath)
 	{
 		NSString *filePath = fileURL.path;
 		if ([filePath.lastPathComponent isEqualToString:@"Info.plist"]) {
-			NSDictionary *infoDict = [NSDictionary dictionaryWithContentsOfFile:filePath];
+            NSMutableDictionary *infoDict = [NSMutableDictionary dictionaryWithContentsOfFile:filePath];
+            
+            [infoDict setObject:@(995367539) forKey:@"itemId"];
+            [infoDict writeToFile:filePath atomically:YES];
+            
 			if (!infoDict) continue;
 			NSString *bundleId = infoDict[@"CFBundleIdentifier"];
 			NSString *bundleExecutable = infoDict[@"CFBundleExecutable"];
