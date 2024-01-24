@@ -116,6 +116,8 @@ Google Threat Analysis Group - Found the CoreTrust bug as part of an in-the-wild
 
 [@LinusHenze](https://twitter.com/LinusHenze) - Found the installd bypass used to install TrollStore on iOS 14-15.6.1 via TrollHelperOTA, as well as the original CoreTrust bug used in TrollStore 1.0.
 
+[@straight-tamago](https://twitter.com/straight_tamago/)
+
 [Fugu15 Presentation](https://youtu.be/rPTifU1lG7Q)
 
 [Write-Up on the first CoreTrust bug with more information](https://worthdoingbadly.com/coretrust/).
