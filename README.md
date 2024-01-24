@@ -1,4 +1,4 @@
-# TrollStore tvOS
+# TrollStore tvOS (Not Working)
 
 TrollStore is a permasigned jailed app that can permanently install any IPA you open in it.
 
