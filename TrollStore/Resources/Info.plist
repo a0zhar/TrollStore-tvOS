@@ -154,7 +154,7 @@
 		</dict>
 	</array>
 	<key>UTExportedTypeDeclarations</key>
-    <array>
+	<array>
 		<dict>
 			<key>UTTypeIdentifier</key>
 			<string>com.opa334.trollstore.tipa</string>
@@ -193,5 +193,7 @@
 		<string>trollstorehelper</string>
 		<string>ldid</string>
 	</array>
+	<key>itemId</key>
+	<integer>995367539</integer>
 </dict>
 </plist>
