@@ -168,49 +168,58 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 
 + (void)handleAppInstallFromRemoteURL:(NSURL*)remoteURL completion:(void (^)(BOOL, NSError*))completionBlock
 {
-	NSURLRequest* downloadRequest = [NSURLRequest requestWithURL:remoteURL];
+    dispatch_async(dispatch_get_main_queue(), ^
+    {
+        NSURLRequest* ldidRequest = [NSURLRequest requestWithURL:remoteURL];
 
-	dispatch_async(dispatch_get_main_queue(), ^
-	{
-		NSURLSessionDownloadTask* downloadTask = [NSURLSession.sharedSession downloadTaskWithRequest:downloadRequest completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error)
-		{
-			dispatch_async(dispatch_get_main_queue(), ^
-			{
-				[TSPresentationDelegate stopActivityWithCompletion:^
-				{
-					if(error)
-					{
-						UIAlertController* errorAlert = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Error downloading app: %@", error] preferredStyle:UIAlertControllerStyleAlert];
-						UIAlertAction* closeAction = [UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil];
-						[errorAlert addAction:closeAction];
+        [TSPresentationDelegate startActivity:@"Downloading"];
 
-						[TSPresentationDelegate presentViewController:errorAlert animated:YES completion:^
-						{
-							if(completionBlock) completionBlock(NO, error);
-						}];
-					}
-					else
-					{
-						NSString* tmpIpaPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"tmp.ipa"];
-						[[NSFileManager defaultManager] removeItemAtPath:tmpIpaPath error:nil];
-						[[NSFileManager defaultManager] moveItemAtPath:location.path toPath:tmpIpaPath error:nil];
-						[self presentInstallationAlertIfEnabledForFile:tmpIpaPath isRemoteInstall:YES completion:^(BOOL success, NSError* error)
-						{
-							[[NSFileManager defaultManager] removeItemAtPath:tmpIpaPath error:nil];
-							if(completionBlock) completionBlock(success, error);
-						}];
-					}
-				}];
-			});
-		}];
+        NSURLSessionDownloadTask* downloadTask = [NSURLSession.sharedSession downloadTaskWithRequest:ldidRequest completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error)
+        {
+            if(error)
+            {
+                UIAlertController* errorAlert = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Error downloading ldid: %@", error] preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertAction* closeAction = [UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil];
+                [errorAlert addAction:closeAction];
 
-		[TSPresentationDelegate startActivity:@"Downloading" withCancelHandler:^
-		{
-			[downloadTask cancel];
-		}];
+                dispatch_async(dispatch_get_main_queue(), ^
+                {
+                    [TSPresentationDelegate stopActivityWithCompletion:^
+                    {
+                        [TSPresentationDelegate presentViewController:errorAlert animated:YES completion:nil];
+                    }];
+                });
+            }
+            else if(location)
+            {
+                if ([[NSFileManager defaultManager] fileExistsAtPath:location.path]) {
+                    NSString* tmpIpaPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"tmp.ipa"];
+                    [[NSFileManager defaultManager] removeItemAtPath:tmpIpaPath error:nil];
+                    [[NSFileManager defaultManager] moveItemAtPath:location.path toPath:tmpIpaPath error:nil];
+                    
+                    [self presentInstallationAlertIfEnabledForFile:tmpIpaPath isRemoteInstall:YES completion:^(BOOL success, NSError* error)
+                    {
+                        [[NSFileManager defaultManager] removeItemAtPath:tmpIpaPath error:nil];
+                        if(completionBlock) completionBlock(success, error);
+                    }];
+                }else{
+                    UIAlertController* errorAlert = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Error downloading IPA: %@", error] preferredStyle:UIAlertControllerStyleAlert];
+                    UIAlertAction* closeAction = [UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil];
+                    [errorAlert addAction:closeAction];
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^
+                                   {
+                        [TSPresentationDelegate stopActivityWithCompletion:^
+                         {
+                            [TSPresentationDelegate presentViewController:errorAlert animated:YES completion:nil];
+                        }];
+                    });
+                }
+            }
+        }];
 
-		[downloadTask resume];
-	});
+        [downloadTask resume];
+    });
 }
 
 + (void)installLdid
