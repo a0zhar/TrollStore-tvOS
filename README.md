@@ -1,5 +1,7 @@
 # TrollStore tvOS (Not Working)
 
+![error](https://github.com/straight-tamago/TrollStore-tvOS/blob/main/error.png) 
+
 TrollStore is a permasigned jailed app that can permanently install any IPA you open in it.
 
 It works because of an AMFI/CoreTrust bug where iOS does not correctly verify code signatures of binaries in which there are multiple signers.
