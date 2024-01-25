@@ -38,9 +38,9 @@
 		_specifiers = [NSMutableArray new];
 
 		#ifdef LEGACY_CT_BUG
-		NSString* credits = @"Powered by Fugu15 CoreTrust & installd bugs, thanks to @LinusHenze\n\n© 2022-2024 Lars Fröder (opa334)";
+		NSString* credits = @"Powered by Fugu15 CoreTrust & installd bugs, thanks to @LinusHenze\n\n© 2022-2024 Lars Fröder (opa334), Porting to tvOS (misaka project by straight-tamago)";
 		#else
-		NSString* credits = @"Powered by CVE-2023-41991, originally discovered by Google TAG, rediscovered via patchdiffing by @alfiecg_dev\n\n© 2022-2024 Lars Fröder (opa334)";
+		NSString* credits = @"Powered by CVE-2023-41991, originally discovered by Google TAG, rediscovered via patchdiffing by @alfiecg_dev\n\n© 2022-2024 Lars Fröder (opa334), Porting to tvOS (misaka project by straight-tamago)";
 		#endif
 
 		PSSpecifier* infoGroupSpecifier = [PSSpecifier emptyGroupSpecifier];

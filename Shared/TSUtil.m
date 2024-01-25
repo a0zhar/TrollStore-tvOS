@@ -307,12 +307,12 @@ void github_fetchLatestVersion(NSString* repo, void (^completionHandler)(NSStrin
 
 void fetchLatestTrollStoreVersion(void (^completionHandler)(NSString* latestVersion))
 {
-	github_fetchLatestVersion(@"opa334/TrollStore", completionHandler);
+	github_fetchLatestVersion(@"straight-tamago/TrollStore-tvOS", completionHandler);
 }
 
 void fetchLatestLdidVersion(void (^completionHandler)(NSString* latestVersion))
 {
-	github_fetchLatestVersion(@"opa334/ldid", completionHandler);
+	github_fetchLatestVersion(@"straight-tamago/ldid-tvOS", completionHandler);
 }
 
 NSArray* trollStoreInstalledAppContainerPaths()
