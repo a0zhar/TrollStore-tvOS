@@ -199,7 +199,7 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 												detail:nil
 												cell:PSStaticTextCell
 												edit:nil];
-				[ldidInstalledSpecifier setProperty:@NO forKey:@"enabled"];
+				[ldidInstalledSpecifier setProperty:@YES forKey:@"enabled"];
 				ldidInstalledSpecifier.identifier = @"ldidInstalled";
 				[_specifiers addObject:ldidInstalledSpecifier];
 
@@ -249,7 +249,7 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 											detail:nil
 											cell:PSStaticTextCell
 											edit:nil];
-			[installedPersistenceHelperSpecifier setProperty:@NO forKey:@"enabled"];
+			[installedPersistenceHelperSpecifier setProperty:@YES forKey:@"enabled"];
 			installedPersistenceHelperSpecifier.identifier = @"persistenceHelperInstalled";
 			[_specifiers addObject:installedPersistenceHelperSpecifier];
 		}
@@ -268,7 +268,7 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 												detail:nil
 												cell:PSStaticTextCell
 												edit:nil];
-				[installedPersistenceHelperSpecifier setProperty:@NO forKey:@"enabled"];
+				[installedPersistenceHelperSpecifier setProperty:@YES forKey:@"enabled"];
 				installedPersistenceHelperSpecifier.identifier = @"persistenceHelperInstalled";
 				[_specifiers addObject:installedPersistenceHelperSpecifier];
 
@@ -304,38 +304,38 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 			}
 		}
 
-		PSSpecifier* installationSettingsGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
-		installationSettingsGroupSpecifier.name = @"Security";
-		[installationSettingsGroupSpecifier setProperty:@"The URL Scheme, when enabled, will allow apps and websites to trigger TrollStore installations through the apple-magnifier://install?url=<IPA_URL> URL scheme." forKey:@"footerText"];
+		// PSSpecifier* installationSettingsGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
+		// installationSettingsGroupSpecifier.name = @"Security";
+		// [installationSettingsGroupSpecifier setProperty:@"The URL Scheme, when enabled, will allow apps and websites to trigger TrollStore installations through the apple-magnifier://install?url=<IPA_URL> URL scheme." forKey:@"footerText"];
 
-		[_specifiers addObject:installationSettingsGroupSpecifier];
+		// [_specifiers addObject:installationSettingsGroupSpecifier];
 
-//		PSSpecifier* URLSchemeToggle = [PSSpecifier preferenceSpecifierNamed:@"URL Scheme Enabled"
-//										target:self
-//										set:@selector(setURLSchemeEnabled:forSpecifier:)
-//										get:@selector(getURLSchemeEnabledForSpecifier:)
-//										detail:nil
-//										cell:PSSwitchCell
-//										edit:nil];
-//
-//		[_specifiers addObject:URLSchemeToggle];
+		// PSSpecifier* URLSchemeToggle = [PSSpecifier preferenceSpecifierNamed:@"URL Scheme Enabled"
+		// 								target:self
+		// 								set:@selector(setURLSchemeEnabled:forSpecifier:)
+		// 								get:@selector(getURLSchemeEnabledForSpecifier:)
+		// 								detail:nil
+		// 								cell:PSSwitchCell
+		// 								edit:nil];
 
-		PSSpecifier* installAlertConfigurationSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Show Install Confirmation Alert"
-										target:self
-										set:@selector(setPreferenceValue:specifier:)
-										get:@selector(readPreferenceValue:)
-										detail:nil
-										cell:PSLinkListCell
-										edit:nil];
+		// [_specifiers addObject:URLSchemeToggle];
 
-		installAlertConfigurationSpecifier.detailControllerClass = [PSListItemsController class];
-		[installAlertConfigurationSpecifier setProperty:@"installationConfirmationValues" forKey:@"valuesDataSource"];
-        [installAlertConfigurationSpecifier setProperty:@"installationConfirmationNames" forKey:@"titlesDataSource"];
-		[installAlertConfigurationSpecifier setProperty:@"com.opa334.TrollStore" forKey:@"defaults"];
-		[installAlertConfigurationSpecifier setProperty:@"installAlertConfiguration" forKey:@"key"];
-        [installAlertConfigurationSpecifier setProperty:@0 forKey:@"default"];
+		// PSSpecifier* installAlertConfigurationSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Show Install Confirmation Alert"
+		// 								target:self
+		// 								set:@selector(setPreferenceValue:specifier:)
+		// 								get:@selector(readPreferenceValue:)
+		// 								detail:nil
+		// 								cell:PSLinkListCell
+		// 								edit:nil];
 
-		[_specifiers addObject:installAlertConfigurationSpecifier];
+		// installAlertConfigurationSpecifier.detailControllerClass = [PSListItemsController class];
+		// [installAlertConfigurationSpecifier setProperty:@"installationConfirmationValues" forKey:@"valuesDataSource"];
+        // [installAlertConfigurationSpecifier setProperty:@"installationConfirmationNames" forKey:@"titlesDataSource"];
+		// [installAlertConfigurationSpecifier setProperty:@"com.opa334.TrollStore" forKey:@"defaults"];
+		// [installAlertConfigurationSpecifier setProperty:@"installAlertConfiguration" forKey:@"key"];
+        // [installAlertConfigurationSpecifier setProperty:@0 forKey:@"default"];
+
+		// [_specifiers addObject:installAlertConfigurationSpecifier];
 
 		PSSpecifier* otherGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
 		[otherGroupSpecifier setProperty:[NSString stringWithFormat:@"TrollStore %@\n\n© 2022-2024 Lars Fröder (opa334)\n\nTrollStore is NOT for piracy!\n\nCredits:\nGoogle TAG, @alfiecg_dev: CoreTrust bug\n@lunotech11, @SerenaKit, @tylinux, @TheRealClarity: Various contributions\n@ProcursusTeam: uicache, ldid\n@cstar_ow: uicache\n@saurik: ldid\n@straight-tamago: Porting to tvOS", [self getTrollStoreVersion]] forKey:@"footerText"];
@@ -388,6 +388,24 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 		[doTheDashSpecifier setProperty:@YES forKey:@"enabled"];
 		uninstallTrollStoreSpecifier.buttonAction = @selector(doTheDashPressed);
 		[_specifiers addObject:doTheDashSpecifier];*/
+
+
+		PSSpecifier* hmmGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
+		hmmGroupSpecifier.name = @"";
+		[hmmGroupSpecifier setProperty:@"" forKey:@"footerText"];
+
+		[_specifiers addObject:hmmGroupSpecifier];
+
+		PSSpecifier* hmmSpecifier = [PSSpecifier preferenceSpecifierNamed:@""
+										target:self
+										set:nil
+										get:nil
+										detail:nil
+										cell:PSStaticTextCell
+										edit:nil];
+		[hmmSpecifier setProperty:@YES forKey:@"enabled"];
+		hmmSpecifier.identifier = @"hmm";
+		[_specifiers addObject:hmmSpecifier];
 	}
 
 	[(UINavigationItem *)self.navigationItem setTitle:@"Settings"];

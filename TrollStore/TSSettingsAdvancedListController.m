@@ -1,4 +1,5 @@
 #import "TSSettingsAdvancedListController.h"
+#import <Preferences/PSListItemsController.h>
 #import <Preferences/PSSpecifier.h>
 
 extern NSUserDefaults* trollStoreUserDefaults();
@@ -37,6 +38,7 @@ extern NSUserDefaults* trollStoreUserDefaults();
 											detail:nil
 											cell:PSLinkListCell
 											edit:nil];
+		installationMethodSegmentSpecifier.detailControllerClass = [PSListItemsController class];
 		[installationMethodSegmentSpecifier setProperty:@YES forKey:@"enabled"];
 		installationMethodSegmentSpecifier.identifier = @"installationMethodSegment";
 		[installationMethodSegmentSpecifier setProperty:@"com.opa334.TrollStore" forKey:@"defaults"];
@@ -69,6 +71,7 @@ extern NSUserDefaults* trollStoreUserDefaults();
 											detail:nil
 											cell:PSLinkListCell
 											edit:nil];
+		uninstallationMethodSegmentSpecifier.detailControllerClass = [PSListItemsController class];
 		[uninstallationMethodSegmentSpecifier setProperty:@YES forKey:@"enabled"];
 		uninstallationMethodSegmentSpecifier.identifier = @"uninstallationMethodSegment";
 		[uninstallationMethodSegmentSpecifier setProperty:@"com.opa334.TrollStore" forKey:@"defaults"];
@@ -77,6 +80,23 @@ extern NSUserDefaults* trollStoreUserDefaults();
 		uninstallationMethodSegmentSpecifier.titleDictionary = @{@0 : @"installd", @1 : @"Custom"};
 		[uninstallationMethodSegmentSpecifier setProperty:@0 forKey:@"default"];
 		[_specifiers addObject:uninstallationMethodSegmentSpecifier];
+
+		PSSpecifier* hmmGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
+		hmmGroupSpecifier.name = @"";
+		[hmmGroupSpecifier setProperty:@"" forKey:@"footerText"];
+
+		[_specifiers addObject:hmmGroupSpecifier];
+
+		PSSpecifier* hmmSpecifier = [PSSpecifier preferenceSpecifierNamed:@""
+										target:self
+										set:nil
+										get:nil
+										detail:nil
+										cell:PSStaticTextCell
+										edit:nil];
+		[hmmSpecifier setProperty:@YES forKey:@"enabled"];
+		hmmSpecifier.identifier = @"hmm";
+		[_specifiers addObject:hmmSpecifier];
 	}
 
 	[(UINavigationItem *)self.navigationItem setTitle:@"Advanced"];

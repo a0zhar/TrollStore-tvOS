@@ -276,7 +276,7 @@ void killall(NSString* processName, BOOL softly)
 
 void respring(void)
 {
-	killall(@"SpringBoard", YES);
+	killall(@"PineBoard", YES);
 	exit(0);
 }
 
