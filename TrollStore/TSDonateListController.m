@@ -59,16 +59,16 @@
 		[tamagoGroupSpecifier setProperty:@"straight-tamago made some changes to TrollStore to work with tvOS. no donation required" forKey:@"footerText"];
 		[_specifiers addObject:tamagoGroupSpecifier];
 
-		PSSpecifier* tamagoGroupSpecifier = [PSSpecifier preferenceSpecifierNamed:@"straight-tamago"
+		PSSpecifier* tamagoDonateSpecifier = [PSSpecifier preferenceSpecifierNamed:@"straight-tamago"
 									target:self
 									set:nil
 									get:nil
 									detail:nil
 									cell:PSButtonCell
 									edit:nil];
-		tamagoGroupSpecifier.identifier = @"donateToTamago";
-		[tamagoGroupSpecifier setProperty:@YES forKey:@"enabled"];
-		[_specifiers addObject:tamagoGroupSpecifier];
+		tamagoDonateSpecifier.identifier = @"donateToTamago";
+		[tamagoDonateSpecifier setProperty:@YES forKey:@"enabled"];
+		[_specifiers addObject:tamagoDonateSpecifier];
 	}
 	[(UINavigationItem *)self.navigationItem setTitle:@"Donate"];
 	return _specifiers;
