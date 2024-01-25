@@ -144,18 +144,18 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 		[_specifiers addObject:rebuildIconCacheSpecifier];
 
         // test
-        PSSpecifier* testSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Test Install"
-                                            target:self
-                                            set:nil
-                                            get:nil
-                                            detail:nil
-                                            cell:PSButtonCell
-                                            edit:nil];
-        testSpecifier.identifier = @"test";
-        [testSpecifier setProperty:@YES forKey:@"enabled"];
-        testSpecifier.buttonAction = @selector(testPressed);
+        // PSSpecifier* testSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Test Install"
+        //                                     target:self
+        //                                     set:nil
+        //                                     get:nil
+        //                                     detail:nil
+        //                                     cell:PSButtonCell
+        //                                     edit:nil];
+        // testSpecifier.identifier = @"test";
+        // [testSpecifier setProperty:@YES forKey:@"enabled"];
+        // testSpecifier.buttonAction = @selector(testPressed);
 
-        [_specifiers addObject:testSpecifier];
+        // [_specifiers addObject:testSpecifier];
         
         
 		//if (@available(iOS 16, *)) { } else {
@@ -338,7 +338,7 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
 		[_specifiers addObject:installAlertConfigurationSpecifier];
 
 		PSSpecifier* otherGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
-		[otherGroupSpecifier setProperty:[NSString stringWithFormat:@"TrollStore %@\n\n© 2022-2024 Lars Fröder (opa334)\n\nTrollStore is NOT for piracy!\n\nCredits:\nGoogle TAG, @alfiecg_dev: CoreTrust bug\n@lunotech11, @SerenaKit, @tylinux, @TheRealClarity: Various contributions\n@ProcursusTeam: uicache, ldid\n@cstar_ow: uicache\n@saurik: ldid", [self getTrollStoreVersion]] forKey:@"footerText"];
+		[otherGroupSpecifier setProperty:[NSString stringWithFormat:@"TrollStore %@\n\n© 2022-2024 Lars Fröder (opa334)\n\nTrollStore is NOT for piracy!\n\nCredits:\nGoogle TAG, @alfiecg_dev: CoreTrust bug\n@lunotech11, @SerenaKit, @tylinux, @TheRealClarity: Various contributions\n@ProcursusTeam: uicache, ldid\n@cstar_ow: uicache\n@saurik: ldid\n@straight-tamago: Porting to tvOS", [self getTrollStoreVersion]] forKey:@"footerText"];
 		[_specifiers addObject:otherGroupSpecifier];
 
 		PSSpecifier* advancedLinkSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Advanced"

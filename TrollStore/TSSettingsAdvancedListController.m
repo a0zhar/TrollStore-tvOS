@@ -35,7 +35,7 @@ extern NSUserDefaults* trollStoreUserDefaults();
 											set:@selector(setPreferenceValue:specifier:)
 											get:@selector(readPreferenceValue:)
 											detail:nil
-											cell:PSSegmentCell
+											cell:PSLinkListCell
 											edit:nil];
 		[installationMethodSegmentSpecifier setProperty:@YES forKey:@"enabled"];
 		installationMethodSegmentSpecifier.identifier = @"installationMethodSegment";
@@ -67,7 +67,7 @@ extern NSUserDefaults* trollStoreUserDefaults();
 											set:@selector(setPreferenceValue:specifier:)
 											get:@selector(readPreferenceValue:)
 											detail:nil
-											cell:PSSegmentCell
+											cell:PSLinkListCell
 											edit:nil];
 		[uninstallationMethodSegmentSpecifier setProperty:@YES forKey:@"enabled"];
 		uninstallationMethodSegmentSpecifier.identifier = @"uninstallationMethodSegment";

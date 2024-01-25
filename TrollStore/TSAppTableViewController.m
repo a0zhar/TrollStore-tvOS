@@ -111,65 +111,58 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 	self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
 
 	[self _setUpNavigationBar];
-	[self _setUpSearchBar];
+	// [self _setUpSearchBar];
 }
 
-- (void)_setUpNavigationBar
+- (void)installFromURLTapped
 {
-	UIAction* installFromFileAction = [UIAction actionWithTitle:@"Install IPA File" image:[UIImage systemImageNamed:@"doc.badge.plus"] identifier:@"InstallIPAFile" handler:^(__kindof UIAction *action)
+	dispatch_async(dispatch_get_main_queue(), ^
 	{
-		dispatch_async(dispatch_get_main_queue(), ^
+		UIAlertController* installURLController = [UIAlertController alertControllerWithTitle:@"Install from URL" message:@"" preferredStyle:UIAlertControllerStyleAlert];
+
+		[installURLController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+			textField.placeholder = @"URL";
+		}];
+
+		UIAlertAction* installAction = [UIAlertAction actionWithTitle:@"Install" style:UIAlertActionStyleDefault handler:^(UIAlertAction* action)
 		{
-			UTType* ipaType = [UTType typeWithFilenameExtension:@"ipa" conformingToType:UTTypeData];
-			UTType* tipaType = [UTType typeWithFilenameExtension:@"tipa" conformingToType:UTTypeData];
+			[TSPresentationDelegate startActivity:@"Downloading"];
 
-			UIDocumentPickerViewController* documentPickerVC = [[UIDocumentPickerViewController alloc] initForOpeningContentTypes:@[ipaType, tipaType]];
-			documentPickerVC.allowsMultipleSelection = NO;
-			documentPickerVC.delegate = self;
-
-			[TSPresentationDelegate presentViewController:documentPickerVC animated:YES completion:nil];
-		});
-	}];
-
-	UIAction* installFromURLAction = [UIAction actionWithTitle:@"Install from URL" image:[UIImage systemImageNamed:@"link.badge.plus"] identifier:@"InstallFromURL" handler:^(__kindof UIAction *action)
-	{
-		dispatch_async(dispatch_get_main_queue(), ^
-		{
-			UIAlertController* installURLController = [UIAlertController alertControllerWithTitle:@"Install from URL" message:@"" preferredStyle:UIAlertControllerStyleAlert];
-
-			[installURLController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-				textField.placeholder = @"URL";
-			}];
-
-			UIAlertAction* installAction = [UIAlertAction actionWithTitle:@"Install" style:UIAlertActionStyleDefault handler:^(UIAlertAction* action)
+			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
 			{
 				NSString* URLString = installURLController.textFields.firstObject.text;
 				NSURL* remoteURL = [NSURL URLWithString:URLString];
 
 				[TSInstallationController handleAppInstallFromRemoteURL:remoteURL completion:nil];
-			}];
-			[installURLController addAction:installAction];
+				
+				dispatch_async(dispatch_get_main_queue(), ^
+				{
+					[TSPresentationDelegate stopActivityWithCompletion:nil];
+				});
+			});
+		}];
+		[installURLController addAction:installAction];
 
-			UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
-			[installURLController addAction:cancelAction];
+		UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+		[installURLController addAction:cancelAction];
 
-			[TSPresentationDelegate presentViewController:installURLController animated:YES completion:nil];
-		});
-	}];
+		[TSPresentationDelegate presentViewController:installURLController animated:YES completion:nil];
+	});
+}
 
-	UIMenu* installMenu = [UIMenu menuWithChildren:@[installFromFileAction, installFromURLAction]];
-
-	UIBarButtonItem* installBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"plus"] menu:installMenu];
-	
-	self.navigationItem.rightBarButtonItems = @[installBarButtonItem];
+- (void)_setUpNavigationBar
+{
+    // Create a single bar button item for "Install from URL"
+    UIBarButtonItem* installFromURLBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"link.badge.plus"] style:UIBarButtonItemStylePlain target:self action:@selector(installFromURLTapped)];
+    self.navigationItem.rightBarButtonItem = installFromURLBarButtonItem;
 }
 
 - (void)_setUpSearchBar
 {
-//	_searchController = [[UISearchController alloc] initWithSearchResultsController:nil];
-//	_searchController.searchResultsUpdater = self;
-//	_searchController.obscuresBackgroundDuringPresentation = NO;
-//	self.navigationItem.searchController = _searchController;
+	_searchController = [[UISearchController alloc] initWithSearchResultsController:nil];
+	_searchController.searchResultsUpdater = self;
+	_searchController.obscuresBackgroundDuringPresentation = NO;
+	self.navigationItem.searchController = _searchController;
 	self.navigationItem.hidesSearchBarWhenScrolling = YES;
 }
 

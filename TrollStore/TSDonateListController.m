@@ -53,6 +53,11 @@
 		[opaDonateSpecifier setProperty:@YES forKey:@"enabled"];
 		opaDonateSpecifier.buttonAction = @selector(donateToOpaPressed);
 		[_specifiers addObject:opaDonateSpecifier];
+
+		PSSpecifier* opaGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
+		opaGroupSpecifier.name = @"Opa";
+		[opaGroupSpecifier setProperty:@"Opa developed the ChOma library, helped with automating the bug using it and integrated it into TrollStore." forKey:@"footerText"];
+		[_specifiers addObject:opaGroupSpecifier];
 	}
 	[(UINavigationItem *)self.navigationItem setTitle:@"Donate"];
 	return _specifiers;

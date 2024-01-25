@@ -199,8 +199,14 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
                     
                     [self presentInstallationAlertIfEnabledForFile:tmpIpaPath isRemoteInstall:YES completion:^(BOOL success, NSError* error)
                     {
-                        [[NSFileManager defaultManager] removeItemAtPath:tmpIpaPath error:nil];
-                        if(completionBlock) completionBlock(success, error);
+						dispatch_async(dispatch_get_main_queue(), ^
+						{
+							[TSPresentationDelegate stopActivityWithCompletion:^
+							{
+								[[NSFileManager defaultManager] removeItemAtPath:tmpIpaPath error:nil];
+								if(completionBlock) completionBlock(success, error);
+							}];
+						});
                     }];
                 }else{
                     UIAlertController* errorAlert = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Error downloading IPA: %@", error] preferredStyle:UIAlertControllerStyleAlert];
@@ -208,7 +214,7 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
                     [errorAlert addAction:closeAction];
                     
                     dispatch_async(dispatch_get_main_queue(), ^
-                                   {
+					{
                         [TSPresentationDelegate stopActivityWithCompletion:^
                          {
                             [TSPresentationDelegate presentViewController:errorAlert animated:YES completion:nil];
