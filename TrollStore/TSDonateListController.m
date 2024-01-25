@@ -54,10 +54,21 @@
 		opaDonateSpecifier.buttonAction = @selector(donateToOpaPressed);
 		[_specifiers addObject:opaDonateSpecifier];
 
-		PSSpecifier* opaGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
-		opaGroupSpecifier.name = @"Opa";
-		[opaGroupSpecifier setProperty:@"Opa developed the ChOma library, helped with automating the bug using it and integrated it into TrollStore." forKey:@"footerText"];
-		[_specifiers addObject:opaGroupSpecifier];
+		PSSpecifier* tamagoGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
+		tamagoGroupSpecifier.name = @"straight-tamago";
+		[tamagoGroupSpecifier setProperty:@"straight-tamago made some changes to TrollStore to work with tvOS. no donation required" forKey:@"footerText"];
+		[_specifiers addObject:tamagoGroupSpecifier];
+
+		PSSpecifier* tamagoGroupSpecifier = [PSSpecifier preferenceSpecifierNamed:@"straight-tamago"
+									target:self
+									set:nil
+									get:nil
+									detail:nil
+									cell:PSButtonCell
+									edit:nil];
+		tamagoGroupSpecifier.identifier = @"donateToTamago";
+		[tamagoGroupSpecifier setProperty:@YES forKey:@"enabled"];
+		[_specifiers addObject:tamagoGroupSpecifier];
 	}
 	[(UINavigationItem *)self.navigationItem setTitle:@"Donate"];
 	return _specifiers;
