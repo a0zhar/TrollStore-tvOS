@@ -55,7 +55,7 @@
 		[_specifiers addObject:opaDonateSpecifier];
 
 		PSSpecifier* tamagoGroupSpecifier = [PSSpecifier emptyGroupSpecifier];
-		tamagoGroupSpecifier.name = @"straight-tamago";
+		tamagoGroupSpecifier.name = @"straight-tamago of misaka project";
 		[tamagoGroupSpecifier setProperty:@"straight-tamago made some changes to TrollStore to work with tvOS. no donation required" forKey:@"footerText"];
 		[_specifiers addObject:tamagoGroupSpecifier];
 
