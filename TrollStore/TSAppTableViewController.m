@@ -358,29 +358,30 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 
 	if(appId)
 	{
-		UIImage* cachedIcon = _cachedIcons[appId];
-		if(cachedIcon)
-		{
-			cell.imageView.image = cachedIcon;
-		}
-		else
-		{
-			cell.imageView.image = _placeholderIcon;
-			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
-			{
-				UIImage* iconImage = imageWithSize([UIImage _applicationIconImageForBundleIdentifier:appId format:iconFormatToUse() scale:[UIScreen mainScreen].scale], _placeholderIcon.size);
-				_cachedIcons[appId] = iconImage;
-				dispatch_async(dispatch_get_main_queue(), ^{
-					NSIndexPath *curIndexPath = [NSIndexPath indexPathForRow:[_cachedAppInfos indexOfObject:appInfo] inSection:0];
-					UITableViewCell *curCell = [tableView cellForRowAtIndexPath:curIndexPath];
-					if(curCell)
-					{
-						curCell.imageView.image = iconImage;
-						[curCell setNeedsLayout];
-					}
-				});
-			});
-		}
+	// 	UIImage* cachedIcon = _cachedIcons[appId];
+	// 	if(cachedIcon)
+	// 	{
+	// 		cell.imageView.image = cachedIcon;
+	// 	}
+	// 	else
+	// 	{
+	// 		cell.imageView.image = _placeholderIcon;
+	// 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
+	// 		{
+	// 			UIImage* iconImage = imageWithSize([UIImage _applicationIconImageForBundleIdentifier:appId format:iconFormatToUse() scale:[UIScreen mainScreen].scale], _placeholderIcon.size);
+	// 			_cachedIcons[appId] = iconImage;
+	// 			dispatch_async(dispatch_get_main_queue(), ^{
+	// 				NSIndexPath *curIndexPath = [NSIndexPath indexPathForRow:[_cachedAppInfos indexOfObject:appInfo] inSection:0];
+	// 				UITableViewCell *curCell = [tableView cellForRowAtIndexPath:curIndexPath];
+	// 				if(curCell)
+	// 				{
+	// 					curCell.imageView.image = iconImage;
+	// 					[curCell setNeedsLayout];
+	// 				}
+	// 			});
+	// 		});
+	// 	}
+		cell.imageView.image = [UIImage _applicationIconImageForBundleIdentifier:appId format:iconFormatToUse() scale:[UIScreen mainScreen].scale];
 	}
 	else
 	{

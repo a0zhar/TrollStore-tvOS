@@ -741,7 +741,7 @@ extern UIImage* imageWithSize(UIImage* image, CGSize size);
 	NSString* displayName = [self displayName];
 
 	NSMutableDictionary* titleAttributes = @{
-		NSFontAttributeName : [UIFont boldSystemFontOfSize:26]
+		NSFontAttributeName : [UIFont boldSystemFontOfSize:36]
 	}.mutableCopy;
 	NSMutableAttributedString* description = [NSMutableAttributedString new];
 
@@ -1042,23 +1042,23 @@ extern UIImage* imageWithSize(UIImage* image, CGSize size);
 	NSMutableAttributedString* description = [NSMutableAttributedString new];
 	
 	NSDictionary* headerAttributes = @{
-		NSFontAttributeName : [UIFont boldSystemFontOfSize:24],
+		NSFontAttributeName : [UIFont boldSystemFontOfSize:34],
 		NSParagraphStyleAttributeName : leftAlignment
 	};
 
 	NSDictionary* bodyAttributes = @{
-		NSFontAttributeName : [UIFont systemFontOfSize:21],
+		NSFontAttributeName : [UIFont systemFontOfSize:31],
 		NSParagraphStyleAttributeName : leftAlignment
 	};
 
 	NSDictionary* bodyWarningAttributes = @{
-		NSFontAttributeName : [UIFont systemFontOfSize:21],
+		NSFontAttributeName : [UIFont systemFontOfSize:31],
 		NSParagraphStyleAttributeName : leftAlignment,
 		NSForegroundColorAttributeName : warningColor
 	};
 
 	NSDictionary* bodyDangerAttributes = @{
-		NSFontAttributeName : [UIFont systemFontOfSize:21],
+		NSFontAttributeName : [UIFont systemFontOfSize:31],
 		NSParagraphStyleAttributeName : leftAlignment,
 		NSForegroundColorAttributeName : dangerColor
 	};
