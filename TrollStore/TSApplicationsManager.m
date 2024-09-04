@@ -42,7 +42,7 @@ extern NSUserDefaults* trollStoreUserDefaults();
         errorDescription = @"Failed to create container for app bundle.";
         break;
         case 171:
-        errorDescription = @"A non-TrollStore app with the same identifier is already installed. If you are absolutely sure it is not, you can force install it.";
+        errorDescription = @"A non "APP_NAME@" or a "OTHER_APP_NAME@" app with the same identifier is already installed. If you are absolutely sure it is not, you can force install it.";
         break;
         case 172:
         errorDescription = @"The app does not contain an Info.plist file.";
@@ -88,6 +88,9 @@ extern NSUserDefaults* trollStoreUserDefaults();
         break;
         case 184:
         errorDescription = @"The app was installed successfully, but has additional binaries that are encrypted (e.g. extensions, plugins). The app itself should work, but you may experience broken functionality as a result.";
+        break;
+        case 185:
+        errorDescription = @"Failed to sign the app. The CoreTrust bypass returned a non zero status code.";
     }
 
     NSError* error = [NSError errorWithDomain:TrollStoreErrorDomain code:code userInfo:@{NSLocalizedDescriptionKey : errorDescription}];

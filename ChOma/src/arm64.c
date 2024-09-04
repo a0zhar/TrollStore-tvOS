@@ -231,7 +231,7 @@ int arm64_gen_mov_imm(char type, arm64_register destinationReg, optional_uint64_
     if (ARM64_REG_IS_ANY_VECTOR(destinationReg)) return -1;
 
     uint32_t inst = 0x12800000;
-    uint32_t mask =  0x7f800000;
+    uint32_t mask = 0x7f800000; // Note this mask includes the type as it's not optional
 
     switch (type) {
         case 'k': {
@@ -293,19 +293,22 @@ int arm64_gen_mov_imm(char type, arm64_register destinationReg, optional_uint64_
 
 int arm64_dec_mov_imm(uint32_t inst, arm64_register *destinationRegOut, uint64_t *immOut, uint64_t *shiftOut, char *typeOut)
 {
-    if ((inst & 0x7f800000) != 0x11000000) return -1;
+    if ((inst & 0x1f800000) != 0x12800000) return -1;
 
     char type = 0;
     uint8_t opc = ((inst >> 29) & 0b11);
     switch (opc) {
         case 0b11: {
             type = 'k';
+            break;
         }
         case 0b00: {
             type = 'n';
+            break;
         }
         case 0b10: {
             type = 'z';
+            break;
         }
         default: {
             return -1;
@@ -411,10 +414,13 @@ static int _arm64_gen_str_ldr_imm(uint32_t inst, uint32_t mask, char type, arm64
             //inst |= (0 << 23) | (0 << 26);
         }
         else {
+            inst |= ARM64_REG_GET_NUM(sourceDestinationReg);
+            mask |= 0x1f;
+
             bool isVector = ARM64_REG_IS_VECTOR(sourceDestinationReg);
             if (isVector && type != 0) return -1;
             mask |= (1 << 23) | (1 << 26) | (0b11 << 30);
-            inst |= (isVector << 26);
+            inst |= (isVector << 26);            
 
             uint8_t size = 0b00;
 
@@ -493,7 +499,7 @@ static int _arm64_gen_str_ldr_imm(uint32_t inst, uint32_t mask, char type, arm64
 
 static int _arm64_dec_str_ldr_imm(uint32_t inst, arm64_register *sourceDestinationRegOut, arm64_register *addrRegOut, uint64_t *immOut, char *typeOut, arm64_ldr_str_type *instTypeOut)
 {
-    bool isVector = (inst >> 26);
+    bool isVector = inst & (1 << 26);
 
     bool isUnsigned = inst & (1 << 24);
     if (!isUnsigned) {
@@ -590,6 +596,17 @@ int arm64_dec_ldr_imm(uint32_t inst, arm64_register *destinationRegOut, arm64_re
     return _arm64_dec_str_ldr_imm(inst, destinationRegOut, addrRegOut, immOut, typeOut, instTypeOut);
 }
 
+int arm64_gen_ldrs_imm(char type, arm64_ldr_str_type instType, arm64_register destinationReg, arm64_register addrReg, optional_uint64_t optImm, uint32_t *bytesOut, uint32_t *maskOut)
+{
+    return _arm64_gen_str_ldr_imm(0x38800000, 0x3ac00000, type, instType, destinationReg, addrReg, optImm, bytesOut, maskOut);
+}
+
+int arm64_dec_ldrs_imm(uint32_t inst, arm64_register *destinationRegOut, arm64_register *addrRegOut, uint64_t *immOut, char *typeOut, arm64_ldr_str_type *instTypeOut)
+{
+    if ((inst & 0x3ac00000) != 0x38800000) return -1;
+	return _arm64_dec_str_ldr_imm(inst, destinationRegOut, addrRegOut, immOut, typeOut, instTypeOut);
+}
+
 int arm64_gen_str_imm(char type, arm64_ldr_str_type instType, arm64_register sourceReg, arm64_register addrReg, optional_uint64_t optImm, uint32_t *bytesOut, uint32_t *maskOut)
 {
     return _arm64_gen_str_ldr_imm(0x38000000, 0x3a400000, type, instType, sourceReg, addrReg, optImm, bytesOut, maskOut);
@@ -601,7 +618,7 @@ int arm64_dec_str_imm(uint32_t inst, arm64_register *sourceRegOut, arm64_registe
     return _arm64_dec_str_ldr_imm(inst, sourceRegOut, addrRegOut, immOut, typeOut, instTypeOut);
 }
 
-int arm64_gen_ldr_lit(arm64_register destinationReg, optional_uint64_t optImm, uint32_t *bytesOut, uint32_t *maskOut)
+int arm64_gen_ldr_lit(arm64_register destinationReg, optional_uint64_t optOrigin, optional_uint64_t optTarget, uint32_t *bytesOut, uint32_t *maskOut)
 {
     if (ARM64_REG_IS_ANY_VECTOR(destinationReg)) return -1;
 
@@ -616,10 +633,11 @@ int arm64_gen_ldr_lit(arm64_register destinationReg, optional_uint64_t optImm, u
         inst |= ARM64_REG_GET_NUM(destinationReg);
     }
 
-    if (OPT_UINT64_IS_SET(optImm)) {
-        uint64_t imm = OPT_UINT64_GET_VAL(optImm);
-        mask |= 0xffffe0;
-        inst |= ((imm / 4) & 0x7ffff) << 5;
+    if (OPT_UINT64_IS_SET(optOrigin) && OPT_UINT64_IS_SET(optTarget)) {
+        uint64_t origin = OPT_UINT64_GET_VAL(optOrigin);
+        uint64_t target = OPT_UINT64_GET_VAL(optTarget);
+        mask |= (0x7ffff << 5);
+        inst |= (((target - origin) / 4) & 0x7ffff) << 5;
     }
 
     if (bytesOut) *bytesOut = inst;
@@ -628,7 +646,7 @@ int arm64_gen_ldr_lit(arm64_register destinationReg, optional_uint64_t optImm, u
     return 0;
 }
 
-int arm64_dec_ldr_lit(uint32_t inst, arm64_register *destinationReg, int64_t *immOut)
+int arm64_dec_ldr_lit(uint32_t inst, uint64_t origin, uint64_t *targetOut, arm64_register *destinationReg)
 {
     if ((inst & 0xbf000000) != 0x18000000) return -1;
 
@@ -636,9 +654,9 @@ int arm64_dec_ldr_lit(uint32_t inst, arm64_register *destinationReg, int64_t *im
         *destinationReg = ARM64_REG((inst & (1 << 30)) ? ARM64_REG_TYPE_X : ARM64_REG_TYPE_W, inst & 0x1f);
     }
 
-    if (immOut) {
+    if (targetOut) {
         uint64_t imm = (inst >> 5) & 0x7ffff;
-        *immOut = (sxt64(imm, 19) * 4);
+        *targetOut = origin + (sxt64(imm, 19) * 4);
     }
 
     return 0;
@@ -669,7 +687,7 @@ int arm64_gen_cb_n_z(optional_bool isCbnz, arm64_register reg, optional_uint64_t
         if (target & ~0x7ffff) {
             return -1;
         }
-        mask |= 0xffffe0;
+        mask |= (0x7ffff << 5);
         inst |= (target << 5);
     }
 
@@ -692,6 +710,76 @@ int arm64_dec_cb_n_z(uint32_t inst, uint64_t origin, bool *isCbnzOut, arm64_regi
     }
     if (targetOut) {
         *targetOut = origin + sxt64(((inst >> 5) & 0x7ffff) * 4, 19);
+    }
+
+    return 0;
+}
+
+int arm64_gen_tb_n_z(optional_bool isTbnz, arm64_register reg, optional_uint64_t optTarget, optional_uint64_t optBit, uint32_t *bytesOut, uint32_t *maskOut)
+{
+    if (ARM64_REG_IS_ANY_VECTOR(reg)) return -1;
+
+    uint32_t inst = 0x36000000;
+    uint32_t mask = 0x7e000000;
+
+    if (OPT_BOOL_IS_SET(isTbnz)) {
+        mask |= (1 << 25);
+        inst |= (OPT_BOOL_GET_VAL(isTbnz)) << 25;
+    }
+
+    if (!ARM64_REG_IS_ANY(reg)) {
+        mask |= 0x1f | (1 << 31);
+        inst |= (ARM64_REG_IS_X(reg) << 31);
+        inst |= ARM64_REG_GET_NUM(reg);
+    }
+
+    if (OPT_UINT64_IS_SET(optTarget)) {
+        uint64_t target = OPT_UINT64_GET_VAL(optTarget) / 4;
+        if (target & ~0x3fff) {
+            return -1;
+        }
+        mask |= (0x3fff << 5);
+        inst |= (target << 5);
+    }
+
+    if (OPT_UINT64_IS_SET(optBit)) {
+        uint64_t bit = OPT_UINT64_GET_VAL(optBit);
+        if (bit & ~0x1f) return -1;
+
+        bool bitIs64 = (bit & (1 << 5));
+        if (!ARM64_REG_IS_ANY(reg)) {
+            if (ARM64_REG_IS_X(reg) != bitIs64) return -1;
+        }
+
+        mask |= (1 << 31) | (0xf << 19);
+        inst |= (bitIs64 << 31) | (bit & 0xf) << 5;
+    }
+
+    if (bytesOut) *bytesOut = inst;
+    if (maskOut) *maskOut = mask;
+    return 0;
+}
+
+int arm64_dec_tb_n_z(uint32_t inst, uint64_t origin, bool *isTbnzOut, arm64_register *regOut, uint64_t *targetOut, uint64_t *bitOut)
+{
+    if ((inst & 0x7e000000) != 0x36000000) return -1;
+
+    bool is64 = inst & (1 << 31);
+
+    if (isTbnzOut) {
+        *isTbnzOut = (inst >> 25);
+    }
+
+    if (regOut) {
+        *regOut = ARM64_REG(is64 ? ARM64_REG_TYPE_X : ARM64_REG_TYPE_W, inst & 0x1f);
+    }
+
+    if (targetOut) {
+        *targetOut = origin + sxt64(((inst >> 5) & 0x3fff) * 4, 14);
+    }
+
+    if (bitOut) {
+        *bitOut = (is64 << 5) | ((inst >> 19) & 0xf);
     }
 
     return 0;

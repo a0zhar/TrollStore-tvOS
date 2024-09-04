@@ -1,6 +1,7 @@
 #import "TSSettingsAdvancedListController.h"
-#import <Preferences/PSListItemsController.h>
+#import "TSUtil.h"
 #import <Preferences/PSSpecifier.h>
+#import <Preferences/PSListItemsController.h>
 
 extern NSUserDefaults* trollStoreUserDefaults();
 @interface PSSpecifier ()
@@ -41,7 +42,7 @@ extern NSUserDefaults* trollStoreUserDefaults();
 		installationMethodSegmentSpecifier.detailControllerClass = [PSListItemsController class];
 		[installationMethodSegmentSpecifier setProperty:@YES forKey:@"enabled"];
 		installationMethodSegmentSpecifier.identifier = @"installationMethodSegment";
-		[installationMethodSegmentSpecifier setProperty:@"com.opa334.TrollStore" forKey:@"defaults"];
+		[installationMethodSegmentSpecifier setProperty:APP_ID forKey:@"defaults"];
 		[installationMethodSegmentSpecifier setProperty:@"installationMethod" forKey:@"key"];
 		installationMethodSegmentSpecifier.values = @[@0, @1];
 		installationMethodSegmentSpecifier.titleDictionary = @{@0 : @"installd", @1 : @"Custom"};
@@ -60,6 +61,7 @@ extern NSUserDefaults* trollStoreUserDefaults();
 											detail:nil
 											cell:PSStaticTextCell
 											edit:nil];
+		uninstallationMethodSegmentSpecifier.detailControllerClass = [PSListItemsController class];
 		[uninstallationMethodSpecifier setProperty:@YES forKey:@"enabled"];
 		uninstallationMethodSpecifier.identifier = @"uninstallationMethodLabel";
 		[_specifiers addObject:uninstallationMethodSpecifier];
@@ -71,10 +73,9 @@ extern NSUserDefaults* trollStoreUserDefaults();
 											detail:nil
 											cell:PSLinkListCell
 											edit:nil];
-		uninstallationMethodSegmentSpecifier.detailControllerClass = [PSListItemsController class];
 		[uninstallationMethodSegmentSpecifier setProperty:@YES forKey:@"enabled"];
 		uninstallationMethodSegmentSpecifier.identifier = @"uninstallationMethodSegment";
-		[uninstallationMethodSegmentSpecifier setProperty:@"com.opa334.TrollStore" forKey:@"defaults"];
+		[uninstallationMethodSegmentSpecifier setProperty:APP_ID forKey:@"defaults"];
 		[uninstallationMethodSegmentSpecifier setProperty:@"uninstallationMethod" forKey:@"key"];
 		uninstallationMethodSegmentSpecifier.values = @[@0, @1];
 		uninstallationMethodSegmentSpecifier.titleDictionary = @{@0 : @"installd", @1 : @"Custom"};

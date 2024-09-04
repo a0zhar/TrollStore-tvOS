@@ -104,7 +104,8 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable) name:@"ApplicationsChanged" object:nil];
 }
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
 	[super viewDidLoad];
 	
 	self.tableView.allowsMultipleSelectionDuringEditing = NO;
@@ -114,6 +115,55 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 	// [self _setUpSearchBar];
 }
 
+// - (void)_setUpNavigationBar
+// {
+// 	UIAction* installFromFileAction = [UIAction actionWithTitle:@"Install IPA File" image:[UIImage systemImageNamed:@"doc.badge.plus"] identifier:@"InstallIPAFile" handler:^(__kindof UIAction *action)
+// 	{
+// 		dispatch_async(dispatch_get_main_queue(), ^
+// 		{
+// 			UTType* ipaType = [UTType typeWithFilenameExtension:@"ipa" conformingToType:UTTypeData];
+// 			UTType* tipaType = [UTType typeWithFilenameExtension:@"tipa" conformingToType:UTTypeData];
+
+// 			UIDocumentPickerViewController* documentPickerVC = [[UIDocumentPickerViewController alloc] initForOpeningContentTypes:@[ipaType, tipaType]];
+// 			documentPickerVC.allowsMultipleSelection = NO;
+// 			documentPickerVC.delegate = self;
+
+// 			[TSPresentationDelegate presentViewController:documentPickerVC animated:YES completion:nil];
+// 		});
+// 	}];
+
+// 	UIAction* installFromURLAction = [UIAction actionWithTitle:@"Install from URL" image:[UIImage systemImageNamed:@"link.badge.plus"] identifier:@"InstallFromURL" handler:^(__kindof UIAction *action)
+// 	{
+// 		dispatch_async(dispatch_get_main_queue(), ^
+// 		{
+// 			UIAlertController* installURLController = [UIAlertController alertControllerWithTitle:@"Install from URL" message:@"" preferredStyle:UIAlertControllerStyleAlert];
+
+// 			[installURLController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+// 				textField.placeholder = @"URL";
+// 			}];
+
+// 			UIAlertAction* installAction = [UIAlertAction actionWithTitle:@"Install" style:UIAlertActionStyleDefault handler:^(UIAlertAction* action)
+// 			{
+// 				NSString* URLString = installURLController.textFields.firstObject.text;
+// 				NSURL* remoteURL = [NSURL URLWithString:URLString];
+
+// 				[TSInstallationController handleAppInstallFromRemoteURL:remoteURL completion:nil];
+// 			}];
+// 			[installURLController addAction:installAction];
+
+// 			UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+// 			[installURLController addAction:cancelAction];
+
+// 			[TSPresentationDelegate presentViewController:installURLController animated:YES completion:nil];
+// 		});
+// 	}];
+
+// 	UIMenu* installMenu = [UIMenu menuWithChildren:@[installFromFileAction, installFromURLAction]];
+
+// 	UIBarButtonItem* installBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"plus"] menu:installMenu];
+	
+// 	self.navigationItem.rightBarButtonItems = @[installBarButtonItem];
+// }
 - (void)installFromURLTapped
 {
 	dispatch_async(dispatch_get_main_queue(), ^
@@ -204,17 +254,17 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 		[didFailController addAction:cancelAction];
 		[TSPresentationDelegate presentViewController:didFailController animated:YES completion:nil];
 	}
-    else if (enableJIT)
-    {
-        int ret = [appsManager enableJITForBundleID:appId];
-        if (ret != 0)
-        {
-            UIAlertController* errorAlert = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Error enabling JIT: trollstorehelper returned %d", ret] preferredStyle:UIAlertControllerStyleAlert];
-            UIAlertAction* closeAction = [UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil];
-            [errorAlert addAction:closeAction];
-            [TSPresentationDelegate presentViewController:errorAlert animated:YES completion:nil];
-        }
-    }
+	else if (enableJIT)
+	{
+		int ret = [appsManager enableJITForBundleID:appId];
+		if (ret != 0)
+		{
+			UIAlertController* errorAlert = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Error enabling JIT: trollstorehelper returned %d", ret] preferredStyle:UIAlertControllerStyleAlert];
+			UIAlertAction* closeAction = [UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil];
+			[errorAlert addAction:closeAction];
+			[TSPresentationDelegate presentViewController:errorAlert animated:YES completion:nil];
+		}
+	}
 }
 
 - (void)showDetailsPressedForRowAtIndexPath:(NSIndexPath*)indexPath
@@ -333,11 +383,13 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 
 #pragma mark - Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
 	return 1;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
 	return _cachedAppInfos.count;
 }
 
@@ -346,7 +398,8 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 	[self reloadTable];
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
 	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ApplicationCell"];
 	if(!cell) {
 		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"ApplicationCell"];
@@ -369,29 +422,29 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 
 	if(appId)
 	{
-	// 	UIImage* cachedIcon = _cachedIcons[appId];
-	// 	if(cachedIcon)
-	// 	{
-	// 		cell.imageView.image = cachedIcon;
-	// 	}
-	// 	else
-	// 	{
-	// 		cell.imageView.image = _placeholderIcon;
-	// 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
-	// 		{
-	// 			UIImage* iconImage = imageWithSize([UIImage _applicationIconImageForBundleIdentifier:appId format:iconFormatToUse() scale:[UIScreen mainScreen].scale], _placeholderIcon.size);
-	// 			_cachedIcons[appId] = iconImage;
-	// 			dispatch_async(dispatch_get_main_queue(), ^{
-	// 				NSIndexPath *curIndexPath = [NSIndexPath indexPathForRow:[_cachedAppInfos indexOfObject:appInfo] inSection:0];
-	// 				UITableViewCell *curCell = [tableView cellForRowAtIndexPath:curIndexPath];
-	// 				if(curCell)
-	// 				{
-	// 					curCell.imageView.image = iconImage;
-	// 					[curCell setNeedsLayout];
-	// 				}
-	// 			});
-	// 		});
-	// 	}
+		// UIImage* cachedIcon = _cachedIcons[appId];
+		// if(cachedIcon)
+		// {
+		// 	cell.imageView.image = cachedIcon;
+		// }
+		// else
+		// {
+		// 	cell.imageView.image = _placeholderIcon;
+		// 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
+		// 	{
+		// 		UIImage* iconImage = imageWithSize([UIImage _applicationIconImageForBundleIdentifier:appId format:iconFormatToUse() scale:[UIScreen mainScreen].scale], _placeholderIcon.size);
+		// 		_cachedIcons[appId] = iconImage;
+		// 		dispatch_async(dispatch_get_main_queue(), ^{
+		// 			NSIndexPath *curIndexPath = [NSIndexPath indexPathForRow:[_cachedAppInfos indexOfObject:appInfo] inSection:0];
+		// 			UITableViewCell *curCell = [tableView cellForRowAtIndexPath:curIndexPath];
+		// 			if(curCell)
+		// 			{
+		// 				curCell.imageView.image = iconImage;
+		// 				[curCell setNeedsLayout];
+		// 			}
+		// 		});
+		// 	});
+		// }
 		cell.imageView.image = [UIImage _applicationIconImageForBundleIdentifier:appId format:iconFormatToUse() scale:[UIScreen mainScreen].scale];
 	}
 	else
@@ -406,7 +459,8 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 	return cell;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
 	return 80.0f;
 }
 
@@ -429,20 +483,20 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 
 	UIAlertAction* openAction = [UIAlertAction actionWithTitle:@"Open" style:UIAlertActionStyleDefault handler:^(UIAlertAction* action)
 	{
-        [self openAppPressedForRowAtIndexPath:indexPath enableJIT:NO];
+		[self openAppPressedForRowAtIndexPath:indexPath enableJIT:NO];
 		[self deselectRow];
 	}];
 	[appSelectAlert addAction:openAction];
-    
-    if ([appInfo isDebuggable])
-    {
-        UIAlertAction* openWithJITAction = [UIAlertAction actionWithTitle:@"Open with JIT" style:UIAlertActionStyleDefault handler:^(UIAlertAction* action)
-        {
-            [self openAppPressedForRowAtIndexPath:indexPath enableJIT:YES];
-            [self deselectRow];
-        }];
-        [appSelectAlert addAction:openWithJITAction];
-    }
+
+	if ([appInfo isDebuggable])
+	{
+		UIAlertAction* openWithJITAction = [UIAlertAction actionWithTitle:@"Open with JIT" style:UIAlertActionStyleDefault handler:^(UIAlertAction* action)
+		{
+			[self openAppPressedForRowAtIndexPath:indexPath enableJIT:YES];
+			[self deselectRow];
+		}];
+		[appSelectAlert addAction:openWithJITAction];
+	}
 
 	UIAlertAction* showDetailsAction = [UIAlertAction actionWithTitle:@"Show Details" style:UIAlertActionStyleDefault handler:^(UIAlertAction* action)
 	{
@@ -491,13 +545,25 @@ UIImage* imageWithSize(UIImage* image, CGSize size)
 	[TSPresentationDelegate presentViewController:appSelectAlert animated:YES completion:nil];
 }
 
-- (void)applicationsDidInstall:(id)arg1
+- (void)purgeCachedIconsForApps:(NSArray <LSApplicationProxy *>*)apps
 {
+	for (LSApplicationProxy *appProxy in apps) {
+		NSString *appId = appProxy.bundleIdentifier;
+		if (_cachedIcons[appId]) {
+			[_cachedIcons removeObjectForKey:appId];
+		}
+	}
+}
+
+- (void)applicationsDidInstall:(NSArray <LSApplicationProxy *>*)apps
+{
+	[self purgeCachedIconsForApps:apps];
 	[self reloadTable];
 }
 
-- (void)applicationsDidUninstall:(id)arg1
+- (void)applicationsDidUninstall:(NSArray <LSApplicationProxy *>*)apps
 {
+	[self purgeCachedIconsForApps:apps];
 	[self reloadTable];
 }
 

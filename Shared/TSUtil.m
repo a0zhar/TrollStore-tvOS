@@ -4,6 +4,7 @@
 #import <spawn.h>
 #import <sys/sysctl.h>
 #import <mach-o/dyld.h>
+#import <libroot.h>
 
 static EXPLOIT_TYPE gPlatformVulnerabilities;
 
@@ -34,6 +35,25 @@ NSString *getExecutablePath(void)
 	_NSGetExecutablePath(selfPath, &len);
 	return [NSString stringWithUTF8String:selfPath];
 }
+
+#ifdef TROLLSTORE_LITE
+
+BOOL shouldRegisterAsUserByDefault(void)
+{
+	if ([[NSFileManager defaultManager] fileExistsAtPath:JBROOT_PATH(@"/Library/MobileSubstrate/DynamicLibraries/AppSyncUnified-FrontBoard.dylib")]) {
+		return YES;
+	}
+	return NO;
+}
+
+#else
+
+BOOL shouldRegisterAsUserByDefault(void)
+{
+	return NO;
+}
+
+#endif
 
 #ifdef EMBEDDED_ROOT_HELPER
 NSString* rootHelperPath(void)
@@ -315,7 +335,7 @@ void fetchLatestLdidVersion(void (^completionHandler)(NSString* latestVersion))
 	github_fetchLatestVersion(@"straight-tamago/ldid-tvOS", completionHandler);
 }
 
-NSArray* trollStoreInstalledAppContainerPaths()
+NSArray* trollStoreInstalledAppContainerPathsInternal(NSString *marker)
 {
 	NSMutableArray* appContainerPaths = [NSMutableArray new];
 
@@ -336,11 +356,12 @@ NSArray* trollStoreInstalledAppContainerPaths()
 		BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:containerPath isDirectory:&isDirectory];
 		if(exists && isDirectory)
 		{
-			NSString* trollStoreMark = [containerPath stringByAppendingPathComponent:@"_TrollStore"];
+			NSString* trollStoreMark = [containerPath stringByAppendingPathComponent:marker];
 			if([[NSFileManager defaultManager] fileExistsAtPath:trollStoreMark])
 			{
 				NSString* trollStoreApp = [containerPath stringByAppendingPathComponent:@"TrollStore.app"];
-				if(![[NSFileManager defaultManager] fileExistsAtPath:trollStoreApp])
+				NSString* trollStoreLiteApp = [containerPath stringByAppendingPathComponent:@"TrollStoreLite.app"];
+				if(![[NSFileManager defaultManager] fileExistsAtPath:trollStoreApp] && ![[NSFileManager defaultManager] fileExistsAtPath:trollStoreLiteApp])
 				{
 					[appContainerPaths addObject:containerPath];
 				}
@@ -351,10 +372,15 @@ NSArray* trollStoreInstalledAppContainerPaths()
 	return appContainerPaths.copy;
 }
 
-NSArray* trollStoreInstalledAppBundlePaths()
+NSArray *trollStoreInstalledAppContainerPaths(void)
+{
+	return trollStoreInstalledAppContainerPathsInternal(TS_ACTIVE_MARKER);
+}
+
+NSArray* trollStoreInstalledAppBundlePathsInternal(NSString *marker)
 {
 	NSMutableArray* appPaths = [NSMutableArray new];
-	for(NSString* containerPath in trollStoreInstalledAppContainerPaths())
+	for(NSString* containerPath in trollStoreInstalledAppContainerPathsInternal(marker))
 	{
 		NSArray* items = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:containerPath error:nil];
 		if(!items) return nil;
@@ -370,10 +396,20 @@ NSArray* trollStoreInstalledAppBundlePaths()
 	return appPaths.copy;
 }
 
+NSArray *trollStoreInstalledAppBundlePaths(void)
+{
+	return trollStoreInstalledAppBundlePathsInternal(TS_ACTIVE_MARKER);
+}
+
+NSArray *trollStoreInactiveInstalledAppBundlePaths(void)
+{
+	return trollStoreInstalledAppBundlePathsInternal(TS_INACTIVE_MARKER);
+}
+
 NSString* trollStorePath()
 {
 	NSError* mcmError;
-	MCMAppContainer* appContainer = [MCMAppContainer containerWithIdentifier:@"com.opa334.TrollStore" createIfNecessary:NO existed:NULL error:&mcmError];
+	MCMAppContainer* appContainer = [MCMAppContainer containerWithIdentifier:APP_ID createIfNecessary:NO existed:NULL error:&mcmError];
 	if(!appContainer) return nil;
 	return appContainer.url.path;
 }
@@ -584,26 +620,35 @@ void determinePlatformVulnerableExploitTypes(void *context) {
 	}
 
 
-	if(strncmp(os_build, "19F5070b", 8) <= 0)
-	{
-		// iOS 14.0 - 15.5 beta 4
-		gPlatformVulnerabilities = (EXPLOIT_TYPE_CUSTOM_ROOT_CERTIFICATE_V1 | EXPLOIT_TYPE_CMS_SIGNERINFO_V1);
-	}
-	else if(strncmp(os_build, "19G5027e", 8) >= 0 && strncmp(os_build, "19G5063a", 8) <= 0)
-	{
-		// iOS 15.6 beta 1 - 5
-		gPlatformVulnerabilities = (EXPLOIT_TYPE_CUSTOM_ROOT_CERTIFICATE_V1 | EXPLOIT_TYPE_CMS_SIGNERINFO_V1);
-	}
-	else if(strncmp(os_build, "20G81", 5) <= 0)
-	{
-		// iOS 14.0 - 16.6.1
-		gPlatformVulnerabilities = EXPLOIT_TYPE_CMS_SIGNERINFO_V1;
-	}
-	else if(strncmp(os_build, "21A5248v", 8) >= 0 && strncmp(os_build, "21A331", 6) <= 0)
-	{
-		// iOS 17.0
-		gPlatformVulnerabilities = EXPLOIT_TYPE_CMS_SIGNERINFO_V1;
-	}
+    if(strncmp(os_build, "18A5319i", 8) < 0) {
+        // Below iOS 14.0 beta 2
+        gPlatformVulnerabilities = 0;
+    }
+    else if(strncmp(os_build, "21A326", 6) >= 0 && strncmp(os_build, "21A331", 6) <= 0)
+    {
+        // iOS 17.0 final
+        gPlatformVulnerabilities = EXPLOIT_TYPE_CMS_SIGNERINFO_V1;
+    }
+    else if(strncmp(os_build, "21A5248v", 8) >= 0 && strncmp(os_build, "21A5326a", 8) <= 0)
+    {
+        // iOS 17.0 beta 1 - 8
+        gPlatformVulnerabilities = EXPLOIT_TYPE_CMS_SIGNERINFO_V1;
+    }
+    else if(strncmp(os_build, "19G5027e", 8) >= 0 && strncmp(os_build, "19G5063a", 8) <= 0)
+    {
+        // iOS 15.6 beta 1 - 5
+        gPlatformVulnerabilities = (EXPLOIT_TYPE_CUSTOM_ROOT_CERTIFICATE_V1 | EXPLOIT_TYPE_CMS_SIGNERINFO_V1);
+    }
+    else if(strncmp(os_build, "19F5070b", 8) <= 0)
+    {
+        // iOS 14.0 beta 2 - 15.5 beta 4
+        gPlatformVulnerabilities = (EXPLOIT_TYPE_CUSTOM_ROOT_CERTIFICATE_V1 | EXPLOIT_TYPE_CMS_SIGNERINFO_V1);
+    }
+    else if(strncmp(os_build, "20H18", 5) <= 0)
+    {
+        // iOS 14.0 - 16.6.1, 16.7 RC (if CUSTOM_ROOT_CERTIFICATE_V1 not supported)
+        gPlatformVulnerabilities = EXPLOIT_TYPE_CMS_SIGNERINFO_V1;
+    }
 
 	free(os_build);
 }

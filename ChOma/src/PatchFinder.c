@@ -62,6 +62,10 @@ PFSection *pfsec_init_from_macho(MachO *macho, const char *filesetEntryId, const
                     pfSection->fileoff = section->offset;
                     pfSection->vmaddr = section->addr;
                     pfSection->size = section->size;
+                    pfSection->initprot = segment->command.initprot;
+                    pfSection->maxprot = segment->command.maxprot;
+                    strncpy(pfSection->segname, segment->command.segname, sizeof(pfSection->segname) / sizeof(char));
+                    strncpy(pfSection->sectname, section->sectname, sizeof(section->sectname) / sizeof(char));
                 }
             }
             else {
@@ -69,16 +73,25 @@ PFSection *pfsec_init_from_macho(MachO *macho, const char *filesetEntryId, const
                 pfSection->fileoff = segment->command.fileoff;
                 pfSection->vmaddr = segment->command.vmaddr;
                 pfSection->size = segment->command.vmsize;
+                pfSection->initprot = segment->command.initprot;
+                pfSection->maxprot = segment->command.maxprot;
+                strncpy(pfSection->segname, segment->command.segname, sizeof(pfSection->segname) / sizeof(char));
             }
         }
     }
 
     if (pfSection) {
         pfSection->cache = NULL;
+        pfSection->ownsCache = false;
         pfSection->macho = macho;
     }
 
     return pfSection;
+}
+
+void pfsec_set_pointer_decoder(PFSection *section, uint64_t (*pointerDecoder)(struct s_PFSection *section, uint64_t vmaddr, uint64_t value))
+{
+    section->pointerDecoder = pointerDecoder;
 }
 
 int pfsec_read_reloff(PFSection *section, uint64_t rel, size_t size, void *outBuf)
@@ -150,6 +163,15 @@ uint64_t pfsec_read64(PFSection *section, uint64_t vmaddr)
     return r;
 }
 
+uint64_t pfsec_read_pointer(PFSection *section, uint64_t vmaddr)
+{
+    uint64_t value = pfsec_read64(section, vmaddr);
+    if (section->pointerDecoder) {
+        return section->pointerDecoder(section, vmaddr, value);
+    }
+    return value;
+}
+
 int pfsec_set_cached(PFSection *section, bool cached)
 {
     bool isCachedAlready = (bool)section->cache;
@@ -175,6 +197,7 @@ int pfsec_set_cached(PFSection *section, bool cached)
                 free(section->cache);
             }
             section->cache = NULL;
+            section->ownsCache = false;
         }
     }
     return 0;
@@ -242,7 +265,7 @@ uint64_t pfsec_find_function_start(PFSection *section, uint64_t midAddr)
             // Technique adapted from pongoOS
             uint64_t frameAddr = pfsec_find_prev_inst(section, midAddr, 0, 0x910003fd, 0xff8003ff); // add x29, sp, ?
             if (frameAddr) {
-                uint64_t start = pfsec_find_prev_inst(section, frameAddr, 10, 0xa9a003e0, 0xffe003e0); // stp ?, ?, [sp, ?]!
+                uint64_t start = pfsec_find_prev_inst(section, frameAddr, 10, 0x29a003e0, 0x3be003e0); // stp ?, ?, [sp, ?]!
                 if (!start) {
                     start = pfsec_find_prev_inst(section, frameAddr, 10, 0xd10003ff, 0xff8003ff); // sub sp, sp, ?
                 }
@@ -251,6 +274,11 @@ uint64_t pfsec_find_function_start(PFSection *section, uint64_t midAddr)
         }
     }
     return 0;
+}
+
+bool pfsec_contains_vmaddr(PFSection *section, uint64_t addr)
+{
+    return (addr >= section->vmaddr && addr < (section->vmaddr + section->size));
 }
 
 void pfsec_free(PFSection *section)
@@ -316,8 +344,14 @@ void _pfsec_run_arm64_xref_metric(PFSection *section, uint64_t startAddr, uint64
     if (metric->typeMask & XREF_TYPE_MASK_CALL) {
         arm64Types |= ARM64_XREF_TYPE_MASK_CALL;
     }
+    if (metric->typeMask & XREF_TYPE_MASK_JUMP) {
+        arm64Types |= ARM64_XREF_TYPE_MASK_JUMP;
+    }
     if (metric->typeMask & XREF_TYPE_MASK_REFERENCE) {
         arm64Types |= ARM64_XREF_TYPE_MASK_REFERENCE;
+    }
+    if (metric->typeMask & XREF_TYPE_MASK_POINTER) {
+        arm64Types |= ARM64_XREF_TYPE_MASK_POINTER;
     }
 
     pfsec_arm64_enumerate_xrefs(section, arm64Types, ^(Arm64XrefType type, uint64_t source, uint64_t target, bool *stop) {
@@ -382,5 +416,3 @@ void pfmetric_run(PFSection *section, void *metric, void (^matchBlock)(uint64_t 
 {
     return pfmetric_run_in_range(section, -1, -1, metric, matchBlock);
 }
-
-

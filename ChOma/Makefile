@@ -17,7 +17,7 @@ INSTALL_PATH ?= /usr/local/
 ifeq ($(TARGET), ios)
 BUILD_DIR := build/ios
 OUTPUT_DIR := output/ios
-CFLAGS += -arch arm64 -isysroot $(shell xcrun --sdk appletvos --show-sdk-path) -mappletvos-version-min=14.0
+CFLAGS += -arch arm64 -arch arm64e -isysroot $(shell xcrun --sdk iphoneos --show-sdk-path) -miphoneos-version-min=11.0
 ifeq ($(DISABLE_SIGNING), 0)
 CFLAGS += external/ios/libcrypto.a
 endif
@@ -64,7 +64,7 @@ all: $(STATIC_LIB) $(DYNAMIC_LIB) copy-choma-headers clean-test $(TESTS_BINARIES
 
 $(STATIC_LIB): $(OBJ_FILES)
 	@mkdir -p $(LIB_DIR)
-	ar rcs $@ $^
+	libtool $^ -o $@
 
 ifeq ($(TARGET), ios)
 $(DYNAMIC_LIB): $(OBJ_FILES)

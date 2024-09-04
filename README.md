@@ -1,16 +1,16 @@
-# TrollStore tvOS
+# # TrollStore tvOS
 
 TrollStore is a permasigned jailed app that can permanently install any IPA you open in it.
 
 It works because of an AMFI/CoreTrust bug where iOS does not correctly verify code signatures of binaries in which there are multiple signers.
 
-Supported versions: 14.0 - 16.6.1, 16.7 RC (20H18), 17.0
+Supported versions: 14.0 beta 2 - 16.6.1, 16.7 RC (20H18), 17.0
 
 ## Installing TrollStore
 
 For installing TrollStore, refer to the guides at [ios.cfw.guide](https://ios.cfw.guide/installing-trollstore)
 
-16.7.x (excluding 16.7 RC) and 17.0.1+ will NEVER be supported (unless Apple fucks CoreTrust up a third time...).
+16.7.x (excluding 16.7 RC) and 17.0.1+ will NEVER be supported (unless a third CoreTrust bug is discovered, which is unlikely).
 
 ## Updating TrollStore
 
@@ -32,9 +32,10 @@ On jailbroken iOS 14 when TrollHelper is used for installation, it is located in
 
 ## URL Scheme
 
-As of version 1.3, TrollStore replaces the system URL scheme "apple-magnifier" (this is done so "jailbreak" detections can't detect TrollStore like they could if TrollStore had a unique URL scheme). This URL scheme can be used to install applications right from the browser, the format goes as follows:
+As of version 1.3, TrollStore replaces the system URL scheme "apple-magnifier" (this is done so "jailbreak" detections can't detect TrollStore like they could if TrollStore had a unique URL scheme). This URL scheme can be used to install applications right from the browser, or to enable JIT from the app itself (only 2.0.12 and above), the format goes as follows:
 
-`apple-magnifier://install?url=<URL_to_IPA>`
+- `apple-magnifier://install?url=<URL_to_IPA>`
+- `apple-magnifier://enable-jit?bundle-id=<Bundle_ID>`
 
 On devices that don't have TrollStore (1.3+) installed, this will just open the magnifier app.
 
@@ -107,6 +108,10 @@ Afterwards you can use the [spawnRoot function in TSUtil.m](./Shared/TSUtil.m#L7
 - Getting proper platformization (`TF_PLATFORM` / `CS_PLATFORMIZED`)
 - Spawning a launch daemon (Would need `CS_PLATFORMIZED`)
 - Injecting a tweak into a system process (Would need `TF_PLATFORM`, a userland PAC bypass and a PMAP trust level bypass)
+
+### Compilation
+
+To compile TrollStore, ensure [theos](https://theos.dev/docs/installation) is installed. Additionaly ensure [brew](https://brew.sh/) is installed and install [libarchive](https://formulae.brew.sh/formula/libarchive) from brew.
 
 ## Credits and Further Reading
 

@@ -1167,21 +1167,21 @@ extern UIImage* imageWithSize(UIImage* image, CGSize size);
 
 - (BOOL)isDebuggable
 {
-    [self loadEntitlements];
-    __block BOOL debuggable = NO;
-    [self enumerateAllEntitlements:^(NSString *key, NSObject *value, BOOL *stop)
-    {
-        if([key isEqualToString:@"get-task-allow"])
-        {
-            NSNumber* valueNum = (NSNumber*)value;
-            if(valueNum && [valueNum isKindOfClass:NSNumber.class])
-            {
-                debuggable = valueNum.boolValue;
-                *stop = YES;
-            }
-        }
-    }];
-    return debuggable;
+	[self loadEntitlements];
+	__block BOOL debuggable = NO;
+	[self enumerateAllEntitlements:^(NSString *key, NSObject *value, BOOL *stop)
+	{
+		if([key isEqualToString:@"get-task-allow"])
+		{
+			NSNumber* valueNum = (NSNumber*)value;
+			if(valueNum && [valueNum isKindOfClass:NSNumber.class])
+			{
+				debuggable = valueNum.boolValue;
+				*stop = YES;
+			}
+		}
+	}];
+	return debuggable;
 }
 
 @end

@@ -86,8 +86,7 @@
     applier(mh, cpusubtype); \
     applier(mh, filetype); \
     applier(mh, ncmds); \
-    applier(mh, sizeofcmds); \
-    applier(mh, reserved);
+    applier(mh, sizeofcmds);
 
 #define LOAD_COMMAND_APPLY_BYTE_ORDER(lc, applier) \
     applier(lc, cmd); \
@@ -167,5 +166,34 @@
     applier(fse, fileoff); \
     applier(fse, entry_id.offset); \
     applier(fse, reserved); \
+
+#define SYMTAB_COMMAND_APPLY_BYTE_ORDER(symt, applier) \
+    applier(symt, cmd); \
+    applier(symt, cmdsize); \
+    applier(symt, nsyms); \
+    applier(symt, stroff); \
+    applier(symt, strsize); \
+    applier(symt, symoff);
+
+#define NLIST_64_APPLY_BYTE_ORDER(nl, applier) \
+    applier(nl, n_un.n_strx); \
+    applier(nl, n_type); \
+    applier(nl, n_sect); \
+    applier(nl, n_desc); \
+    applier(nl, n_value);
+
+#define DYLIB_APPLY_BYTE_ORDER(dylib, applier) \
+    applier(dylib, name.offset); \
+    applier(dylib, timestamp); \
+    applier(dylib, current_version); \
+    applier(dylib, compatibility_version);
+
+#define DYLIB_COMMAND_APPLY_BYTE_ORDER(dycmd, applier) \
+    LOAD_COMMAND_APPLY_BYTE_ORDER(dycmd, applier); \
+    DYLIB_APPLY_BYTE_ORDER((&dycmd->dylib), applier);
+
+#define RPATH_COMMAND_APPLY_BYTE_ORDER(rpcmd, applier) \
+    LOAD_COMMAND_APPLY_BYTE_ORDER(rpcmd, applier); \
+    applier(rpcmd, path.offset);
 
 #endif // MACHO_BYTE_ORDER_H

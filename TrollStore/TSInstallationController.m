@@ -215,7 +215,7 @@ extern NSUserDefaults* trollStoreUserDefaults(void);
                     [errorAlert addAction:closeAction];
                     
                     dispatch_async(dispatch_get_main_queue(), ^
-					{
+                    {
                         [TSPresentationDelegate stopActivityWithCompletion:^
                          {
                             [TSPresentationDelegate presentViewController:errorAlert animated:YES completion:nil];
