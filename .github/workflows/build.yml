@@ -1,4 +1,4 @@
-name: Build TrollStore TvOS IPA
+name: Build TrollStore tvOS IPA
 
 on:
   push:
@@ -12,6 +12,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Patch Makefile to remove missing includes
+        run: |
+          sed -i '' '/\/makefiles\/common.mk/d' Makefile
+          sed -i '' '/\/tool.mk/d' Makefile
 
       - name: Show Xcode version
         run: /usr/bin/xcodebuild -version
