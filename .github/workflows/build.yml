@@ -1,0 +1,30 @@
+name: Build TrollStore TvOS IPA
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: /usr/bin/xcodebuild -version
+
+      - name: Build using Makefile
+        run: make
+
+      - name: Find and list IPA files
+        run: |
+          ls -lh ./_build/*.ipa || echo "No IPA files found."
+
+      - name: Upload IPA artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: TrollStore-ipa
+          path: ./_build/*.ipa
